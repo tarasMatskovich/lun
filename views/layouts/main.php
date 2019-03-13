@@ -52,7 +52,7 @@ NavBar::end(); // закрываем виджет
 ?>
 </div>
 
-<div class="content">
+<div class="content" id="app">
     <div class="container">
         <?=$content?>
     </div>

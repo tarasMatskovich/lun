@@ -54,6 +54,7 @@ $config = [
                 'admin/list/<id:\d+>' => 'admin/show',
                 'admin/edit/<id:\d+>' => 'admin/edit',
                 'admin/delete/<id:\d+>' => 'admin/delete',
+                'admin/house/<id:\d+>' => 'admin/showhouse',
                 'search' => 'search/index',
             ],
         ],

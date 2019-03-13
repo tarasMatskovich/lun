@@ -5,3 +5,11 @@
 .actions a:hover{
     text-decoration: none;
 }
+
+.delete-house-icon {
+    color: red;
+}
+
+.delete-house-icon:hover {
+    color: darkred;
+}

@@ -3,6 +3,8 @@
 namespace app\controllers;
 
 use app\models\Building;
+use app\models\House;
+use yii\web\NotFoundHttpException;
 
 class AdminController extends \yii\web\Controller
 {
@@ -19,7 +21,14 @@ class AdminController extends \yii\web\Controller
 
     public function actionShow($id)
     {
-        return $id;
+        $building = Building::findOne($id);
+        if (!$building)
+            throw new NotFoundHttpException("Такой новостройки нет");
+//        echo '<pre>';
+//        print_r($building);
+//        echo '</pre>';
+//        die;
+        return $this->render('show', ['building' => $building]);
     }
 
     public function actionEdit($id)
@@ -34,7 +43,7 @@ class AdminController extends \yii\web\Controller
 
     public function actionAdd()
     {
-        return 123;
+        return $this->render('add_building');
     }
 
     public function actionSave()
@@ -45,6 +54,15 @@ class AdminController extends \yii\web\Controller
     public function actionUpdate()
     {
 
+    }
+
+    public function actionShowhouse($id)
+    {
+        $house = House::findOne($id);
+        if (!$house)
+            throw new NotFoundHttpException('Такого дома нет');
+
+        return $this->render('show_house', ['house' => $house]);
     }
 
 }
