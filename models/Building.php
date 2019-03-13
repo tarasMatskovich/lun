@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\models\House;
 
 /**
  * This is the model class for table "buildings".
@@ -41,5 +42,16 @@ class Building extends \yii\db\ActiveRecord
             'title' => 'Title',
             'city' => 'City',
         ];
+    }
+
+    // Relations
+    public function getHouses()
+    {
+        return $this->hasMany(House::className(), ['building_id' => 'id']);
+    }
+
+    public function getApartments()
+    {
+        return $this->hasMany(TypicalApartment::className(), ['building_id' => 'id']);
     }
 }

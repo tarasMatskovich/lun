@@ -50,4 +50,11 @@ class NonTypicalApartment extends \yii\db\ActiveRecord
             'house_id' => 'House ID',
         ];
     }
+
+    // Relations
+
+    public function getHouse()
+    {
+        return $this->hasOne(House::className(), ['id' => 'house_id']);
+    }
 }

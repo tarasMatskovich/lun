@@ -43,4 +43,16 @@ class House extends \yii\db\ActiveRecord
             'building_id' => 'Building ID',
         ];
     }
+
+    // Relations
+
+    public function getBuilding()
+    {
+        return $this->hasOne(Building::className(), ['id' => 'building_id']);
+    }
+
+    public function getApartments()
+    {
+        return $this->hasMany(NonTypicalApartment::className(), ['house_id' => 'id']);
+    }
 }

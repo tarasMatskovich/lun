@@ -2,9 +2,11 @@
 
 ?>
 
-<h1>Список новостроек</h1>
+<h1 class="title">Список новостроек</h1>
 
-<table class="table">
+<a class="btn btn-success" href="<?=\yii\helpers\Url::to(['admin/add'])?>">Добавить</a>
+
+<table class="table buildings-list">
     <thead>
     <tr>
         <th scope="col">Название</th>
@@ -23,7 +25,7 @@
                 <?=$building->city?>
             </td>
             <td>
-                <?=3?>
+                <?=count($building->houses)?>
             </td>
             <td class="actions">
                 <a href="<?=\yii\helpers\Url::to(['admin/show', 'id' => $building->id])?>">

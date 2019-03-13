@@ -13,7 +13,7 @@ class AdminController extends \yii\web\Controller
 
     public function actionList()
     {
-        $buildings = Building::find()->all();
+        $buildings = Building::find()->with('houses')->all();
         return $this->render('list', ['buildings' => $buildings]);
     }
 
@@ -32,12 +32,17 @@ class AdminController extends \yii\web\Controller
         return $id;
     }
 
-    public function save()
+    public function actionAdd()
+    {
+        return 123;
+    }
+
+    public function actionSave()
     {
 
     }
 
-    public function update()
+    public function actionUpdate()
     {
 
     }

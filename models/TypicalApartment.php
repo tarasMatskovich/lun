@@ -50,4 +50,11 @@ class TypicalApartment extends \yii\db\ActiveRecord
             'building_id' => 'Building ID',
         ];
     }
+
+    // Relations
+
+    public function getBuilding()
+    {
+        return $this->hasOne(Building::className(), ['id' => 'building_id']);
+    }
 }

@@ -49,6 +49,7 @@ $config = [
             'rules' => [
                 '' => 'index/index',
                 'admin' => 'admin/index',
+                'admin/add' => 'admin/add',
                 'admin/list' => 'admin/list',
                 'admin/list/<id:\d+>' => 'admin/show',
                 'admin/edit/<id:\d+>' => 'admin/edit',
