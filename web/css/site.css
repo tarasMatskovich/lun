@@ -13,3 +13,8 @@
 .delete-house-icon:hover {
     color: darkred;
 }
+
+.back-btn{
+    display: inline-block;
+    margin-bottom: 30px;
+}

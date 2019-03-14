@@ -6,6 +6,7 @@ use app\models\Building;
 use app\models\House;
 use app\models\NonTypicalApartment;
 use app\models\TypicalApartment;
+use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use Yii;
 
@@ -27,7 +28,57 @@ class AdminController extends \yii\web\Controller
         $building = Building::findOne($id);
         if (!$building)
             throw new NotFoundHttpException("Такой новостройки нет");
-        return $this->render('show', ['building' => $building]);
+        $nonTypicalAppartments = [];
+        foreach ($building->houses as $house) {
+            foreach ($house->apartments as $apartment) {
+                $nonTypicalAppartments[] = $apartment;
+            }
+        }
+        return $this->render('show', ['building' => $building, 'nonTypicalApartments' => $nonTypicalAppartments]);
+    }
+
+    public function actionDeletehouse($id)
+    {
+        $house = House::findOne($id);
+        $building_id = $house->building_id;
+        if (!$house)
+            throw new NotFoundHttpException('Такого дома нет');
+        // удаляем все не типичные дома в этом доме
+        foreach ($house->apartments as $apartment) {
+            $apartment->delete();
+        }
+        if ($house->delete()) {
+            Yii::$app->session->setFlash('success', 'Дом был успешно удален');
+        } else {
+            Yii::$app->session->setFlash('success', 'При удалении дома произошла ошибка');
+        }
+        $this->redirect(Url::to(['admin/show', 'id' => $building_id]));
+    }
+
+    public function actionTypicaldelete($id) {
+        $apartment = TypicalApartment::findOne($id);
+        if (!$apartment)
+            throw new NotFoundHttpException('Такой квартиры нет');
+        $building_id = $apartment->building_id;
+        if ($apartment->delete()) {
+            Yii::$app->session->setFlash('success', 'Квартира была успешно удалена');
+        } else {
+            Yii::$app->session->setFlash('success', 'При удалении квартиры произошла ошибка');
+        }
+        $this->redirect(Url::to(['admin/show', 'id' => $building_id]));
+    }
+
+    public function actionNontypicaldelete($id) {
+        $apartment = NonTypicalApartment::findOne($id);
+        if (!$apartment)
+            throw new NotFoundHttpException('Такой квартиры нет');
+        $building_id = $apartment->house->building_id;
+        if ($apartment->delete()) {
+            Yii::$app->session->setFlash('success', 'Квартира была успешно удалена');
+        } else {
+            Yii::$app->session->setFlash('success', 'При удалении квартиры произошла ошибка');
+        }
+        $this->redirect(Url::to(['admin/show', 'id' => $building_id]));
     }
 
     public function actionEdit($id)
@@ -37,7 +88,28 @@ class AdminController extends \yii\web\Controller
 
     public function actionDelete($id)
     {
-        return $id;
+        $building = Building::findOne($id);
+        if (!$building)
+            throw new NotFoundHttpException('Такой новостройки нет');
+        // удаляем все типичные квартиры в новостройке
+        foreach ($building->apartments as $apartment) {
+            $apartment->delete();
+        }
+        // удаляем все дома в новостройке и все не типичные квартиры в даной новостройке
+        foreach ($building->houses as $house) {
+            foreach ($house->apartments as $apartment) {
+                $apartment->delete();
+            }
+            $house->delete();
+        }
+        // удаляем саму новостройку
+        if ($building->delete()) {
+            Yii::$app->session->setFlash('success', 'Новостройка была успешно удалена');
+        } else {
+            Yii::$app->session->setFlash('success', 'При удалении новостройки произошла ошибка');
+        }
+        $this->redirect(Url::to(['admin/list']));
+
     }
 
     public function actionAdd()
