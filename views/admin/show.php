@@ -83,11 +83,11 @@
                 <?=$apartment->price ? $apartment->price : "-"?>
             </td>
             <td class="actions">
-                <a href="">
+                <a href="<?=\yii\helpers\Url::to(['admin/typicalshowapartment', 'id' => $apartment->id])?>">
                     <i class="fas fa-eye"></i>
                 </a>
                 &nbsp;&nbsp;
-                <a href="">
+                <a href="<?=\yii\helpers\Url::to(['admin/typicaleditapartment', 'id' => $apartment->id])?>">
                     <i class="fas fa-edit"></i>
                 </a>
                 &nbsp;&nbsp;
@@ -114,6 +114,7 @@
             <th scope="col">Площадь</th>
             <th scope="col">Цена за 1м квадратный</th>
             <th scope="col">Цена за всю квартиру</th>
+            <th scope="col">Дом</th>
             <th scope="col">Действия</th>
         </tr>
     </thead>
@@ -132,12 +133,15 @@
             <td>
                 <?=$apartment->price ? $apartment->price : "-"?>
             </td>
+            <td>
+                <?=$apartment->house->title?>
+            </td>
             <td class="actions">
-                <a href="">
+                <a href="<?=\yii\helpers\Url::to(['admin/nontypicalshowapartment', 'id' => $apartment->id])?>">
                     <i class="fas fa-eye"></i>
                 </a>
                 &nbsp;&nbsp;
-                <a href="">
+                <a href="<?=\yii\helpers\Url::to(['admin/nontypicaleditapartment', 'id' => $apartment->id])?>">
                     <i class="fas fa-edit"></i>
                 </a>
                 &nbsp;&nbsp;

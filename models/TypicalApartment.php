@@ -33,6 +33,8 @@ class TypicalApartment extends \yii\db\ActiveRecord
             [['rooms'], 'string'],
             [['square', 'price_per_square_meter', 'price'], 'number'],
             [['building_id'], 'integer'],
+            [['rooms'], 'required'],
+            [['square'], 'required'],
         ];
     }
 

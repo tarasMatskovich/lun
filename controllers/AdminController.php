@@ -6,12 +6,28 @@ use app\models\Building;
 use app\models\House;
 use app\models\NonTypicalApartment;
 use app\models\TypicalApartment;
+use yii\filters\VerbFilter;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use Yii;
 
 class AdminController extends \yii\web\Controller
 {
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'update' => ['post'],
+                    'updatehouse' => ['post'],
+                    'nontypicalupdateapartment' => ['post'],
+                    'typicalupdateapartment' => ['post'],
+                ]
+            ]
+        ];
+    }
+
     public function actionIndex()
     {
         return $this->render('index');
@@ -79,11 +95,6 @@ class AdminController extends \yii\web\Controller
             Yii::$app->session->setFlash('success', 'При удалении квартиры произошла ошибка');
         }
         $this->redirect(Url::to(['admin/show', 'id' => $building_id]));
-    }
-
-    public function actionEdit($id)
-    {
-        return $id;
     }
 
     public function actionDelete($id)
@@ -187,9 +198,29 @@ class AdminController extends \yii\web\Controller
 
     }
 
-    public function actionUpdate()
+    public function actionEdit($id)
     {
+        $building = Building::findOne($id);
+        if (!$building)
+            throw new NotFoundHttpException('Такой новостройки нет');
+        return $this->render('building_edit', ['building' => $building]);
+    }
 
+    public function actionUpdate($id)
+    {
+        $building = Building::findOne($id);
+        if (!$building)
+            throw new NotFoundHttpException('Такой новостройки нет');
+        $data = Yii::$app->request->post();
+        $building->title = $data['title'];
+        $building->city = $data['city'];
+        if ($building->save()) {
+            Yii::$app->session->setFlash('success', 'Новостройка была успешно сохранена');
+            return $this->redirect(Url::to(['admin/list']));
+        } else {
+            Yii::$app->session->setFlash('error', 'При сохранении новостройки произошла ошибка: проверьте правильность заполнения полей');
+            return $this->redirect(Url::to(['admin/edit', 'id' => $id]));
+        }
     }
 
     public function actionShowhouse($id)
@@ -199,6 +230,108 @@ class AdminController extends \yii\web\Controller
             throw new NotFoundHttpException('Такого дома нет');
 
         return $this->render('show_house', ['house' => $house]);
+    }
+
+    public function actionEdithouse($id)
+    {
+        $house = House::findOne($id);
+        if (!$house)
+            throw new NotFoundHttpException('Такого дома нет');
+        return $this->render('edit_house', ['house' => $house]);
+    }
+
+    public function actionUpdatehouse($id)
+    {
+        $house = House::findOne($id);
+        $building_id = $house->building_id;
+        if (!$house)
+            throw new NotFoundHttpException('Такого дома нет');
+        $data = Yii::$app->request->post();
+        $house->title = $data['title'];
+        if ($house->save()) {
+            Yii::$app->session->setFlash('success', 'Дом был успешно сохранен');
+            return $this->redirect(Url::to(['admin/show', 'id' => $building_id]));
+        } else {
+            Yii::$app->session->setFlash('error', 'При сохранении дома произошла ошибка: проверьте правильность заполнения полей');
+            return $this->redirect(Url::to(['admin/edithouse', 'id' => $id]));
+        }
+    }
+
+    public function actionNontypicalshowapartment($id)
+    {
+        $apartment = NonTypicalApartment::findOne($id);
+        if (!$apartment)
+            throw new NotFoundHttpException('Такой квартиры нет');
+        return $this->render("non_typical_show", ['apartment' => $apartment]);
+    }
+
+    public function actionTypicalshowapartment($id)
+    {
+        $apartment = TypicalApartment::findOne($id);
+        if (!$apartment)
+            throw new NotFoundHttpException('Такой квартиры нет');
+        return $this->render("typical_show", ['apartment' => $apartment]);
+    }
+
+    public function actionNontypicaleditapartment($id)
+    {
+        $apartment = NonTypicalApartment::findOne($id);
+        if (!$apartment)
+            throw new NotFoundHttpException('Такой квартиры нет');
+        return $this->render("non_typical_edit", ['apartment' => $apartment]);
+    }
+
+    public function actionTypicaleditapartment($id)
+    {
+        $apartment = TypicalApartment::findOne($id);
+        if (!$apartment)
+            throw new NotFoundHttpException('Такой квартиры нет');
+        return $this->render("typical_edit", ['apartment' => $apartment]);
+    }
+
+    public function actionNontypicalupdateapartment($id)
+    {
+        $apartment = NonTypicalApartment::findOne($id);
+        if (!$apartment)
+            throw new NotFoundHttpException('Такой квартиры нет');
+        $data = Yii::$app->request->post();
+        $apartment->rooms = $data['rooms'];
+        $apartment->square = $data['square'];
+        if ($data['fullPrice'] == 'true') {
+            $apartment->price = $data['price'];
+        } else {
+            $apartment->price_per_square_meter = $data['price'];
+        }
+        $apartment->house_id = $data['house_id'];
+        if ($apartment->save()) {
+            Yii::$app->session->setFlash('success', 'Квартира успешно сохранилась');
+            return $this->redirect(Url::to(['admin/show', 'id' => $apartment->house->building_id]));
+        } else {
+            Yii::$app->session->setFlash('error', 'При сохранении квартиры произошла ошибка: проверьте правильность заполнения данных');
+            return $this->redirect(Url::to(['admin/nontypicaleditapartment', 'id' => $id]));
+        }
+    }
+
+    public function actionTypicalupdateapartment($id)
+    {
+        $apartment = TypicalApartment::findOne($id);
+        if (!$apartment)
+            throw new NotFoundHttpException('Такой квартиры нет');
+        $data = Yii::$app->request->post();
+        $apartment->rooms = $data['rooms'];
+        $apartment->square = $data['square'];
+        if ($data['fullPrice'] == 'true') {
+            $apartment->price = $data['price'];
+        } else {
+            $apartment->price_per_square_meter = $data['price'];
+        }
+        if ($apartment->save()) {
+            Yii::$app->session->setFlash('success', 'Квартира успешно сохранилась');
+            return $this->redirect(Url::to(['admin/show', 'id' => $apartment->building_id]));
+        } else {
+            Yii::$app->session->setFlash('error', 'При сохранении квартиры произошла ошибка: проверьте правильность заполнения данных');
+            return $this->redirect(Url::to(['admin/typicaleditapartment', 'id' => $id]));
+        }
     }
 
 }

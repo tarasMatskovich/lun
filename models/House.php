@@ -27,8 +27,7 @@ class House extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['building_id'], 'integer'],
-            [['title'], 'string', 'max' => 255],
+            [['title'], 'required'],
         ];
     }
 

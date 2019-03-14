@@ -10,6 +10,7 @@ use yii\helpers\Url;
     Список не типовых квартир в даном доме:
 </h4>
 
+<?php if (count($house->apartments)):?>
 <table class="table non-typical-apartments-list">
     <thead>
     <tr>
@@ -36,15 +37,15 @@ use yii\helpers\Url;
                 <?=$apartment->price ? $apartment->price : "-"?>
             </td>
             <td class="actions">
-                <a href="">
+                <a href="<?=\yii\helpers\Url::to(['admin/nontypicalshowapartment', 'id' => $apartment->id])?>">
                     <i class="fas fa-eye"></i>
                 </a>
                 &nbsp;&nbsp;
-                <a href="">
+                <a href="<?=\yii\helpers\Url::to(['admin/nontypicaleditapartment', 'id' => $apartment->id])?>">
                     <i class="fas fa-edit"></i>
                 </a>
                 &nbsp;&nbsp;
-                <a href="">
+                <a href="<?=\yii\helpers\Url::to(['admin/nontypicaldelete', 'id' => $apartment->id])?>">
                     <i class="fas fa-trash-alt"></i>
                 </a>
             </td>
@@ -52,3 +53,6 @@ use yii\helpers\Url;
     <?php endforeach;?>
     </tbody>
 </table>
+<?php else:?>
+<p>В даном доме пока нет не типовых квартир</p>
+<?php endif;?>
