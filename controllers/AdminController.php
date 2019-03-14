@@ -334,4 +334,61 @@ class AdminController extends \yii\web\Controller
         }
     }
 
+    public function actionSaveapartment()
+    {
+        $data = Yii::$app->request->post();
+        $apartment = $data['apartment'];
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $result = false;
+        if ($apartment['typical'] === 'true') {
+            $apartmentModel = new TypicalApartment();
+            $apartmentModel->rooms = $apartment['rooms'];
+            $apartmentModel->square = $apartment['square'];
+            if ($apartment['fullPrice']) {
+                $apartmentModel->price = $apartment['price'];
+                $apartmentModel->price_per_square_meter = null;
+            } else {
+                $apartmentModel->price = null;
+                $apartmentModel->price_per_square_meter = $apartment['price'];
+            }
+            $apartmentModel->building_id = $data['building_id'];
+            $result = $apartmentModel->save();
+        } else {
+            $apartmentModel = new NonTypicalApartment();
+            $apartmentModel->rooms = $apartment['rooms'];
+            $apartmentModel->square = $apartment['square'];
+            if ($apartment['fullPrice']) {
+                $apartmentModel->price = $apartment['price'];
+                $apartmentModel->price_per_square_meter = null;
+            } else {
+                $apartmentModel->price = null;
+                $apartmentModel->price_per_square_meter = $apartment['price'];
+            }
+            $apartmentModel->house_id = $apartment['house_id'];
+            $result = $apartmentModel->save();
+        }
+        if ($result) {
+            Yii::$app->session->setFlash('success', 'Квартира была успешно добавлена');
+        } else {
+            Yii::$app->session->setFlash('error', 'При сохранении квартиры произошла ошибка');
+        }
+        return ['result' => $result];
+    }
+
+    public function actionSavehouse()
+    {
+        $data = Yii::$app->request->post();
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $house = new House();
+        $house->title = $data['title'];
+        $house->building_id = $data['building_id'];
+        $result = $house->save();
+        if ($result) {
+            Yii::$app->session->setFlash('success', 'Дом был успешно добавлен');
+        } else {
+            Yii::$app->session->setFlash('error', 'При сохранении дома произошла ошибка');
+        }
+        return ['result' => $result];
+    }
+
 }

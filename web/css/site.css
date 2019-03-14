@@ -18,3 +18,11 @@
     display: inline-block;
     margin-bottom: 30px;
 }
+
+.add-house-form-click {
+    border: 1px solid rgba(0,0,0,.7);
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    padding: 20px;
+}

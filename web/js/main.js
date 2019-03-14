@@ -15,7 +15,9 @@ var app = new Vue({
             house_id: null,
             id: 0
         },
-        apartments: []
+        apartments: [],
+        showAddHouseForm:false,
+        showAddApartmentForm:false
     },
     computed: {
       typical() {
@@ -74,22 +76,26 @@ var app = new Vue({
                     alert("Заполните поле дом для не типвой квартиры");
                     this.errors.push("Заполните поле дом для не типвой квартиры");
                 } else {
-                    this.apartments.push({
-                        id: this.apartment.id,
-                        rooms: this.apartment.rooms,
-                        typical: this.apartment.typical,
-                        fullPrice: this.apartment.fullPrice,
-                        house_id: this.apartment.house_id,
-                        price: this.apartment.price,
-                        square: this.apartment.square
-                    });
-                    this.apartment.rooms = 'студия';
-                    this.apartment.square = '';
-                    this.apartment.typical = true;
-                    this.apartment.fullPrice = false;
-                    this.apartment.house_id = null;
-                    this.apartment.price = null;
-                    this.apartment.id++;
+                    if (this.apartment.square === '') {
+                        alert("Заполните поле площадь");
+                    } else {
+                        this.apartments.push({
+                            id: this.apartment.id,
+                            rooms: this.apartment.rooms,
+                            typical: this.apartment.typical,
+                            fullPrice: this.apartment.fullPrice,
+                            house_id: this.apartment.house_id,
+                            price: this.apartment.price,
+                            square: this.apartment.square
+                        });
+                        this.apartment.rooms = 'студия';
+                        this.apartment.square = '';
+                        this.apartment.typical = true;
+                        this.apartment.fullPrice = false;
+                        this.apartment.house_id = null;
+                        this.apartment.price = null;
+                        this.apartment.id++;
+                    }
                 }
             }
         },
@@ -128,6 +134,58 @@ var app = new Vue({
                     }
                 }).fail(function() {
                     alert("Произошла ошибка при сохранении даных");
+                });
+            }
+        },
+        onAddApartmentFormClick() {
+            this.showAddApartmentForm = true;
+        },
+        onAddHouseFormClick() {
+            this.showAddHouseForm = true;
+        },
+        addApartmentFormSubmit() {
+            if (!this.apartment.typical && this.apartment.house_id == null) {
+                alert("Заполните поле дом");
+            } else {
+                if (this.apartment.square === '') {
+                    alert("Заполните поле площадь");
+                } else {
+                    if (this.apartment.price === null) {
+                        alert("Заполните поле цена");
+                    } else {
+                        var building_id = $("#building-id").val();
+                        $.ajax({
+                            type: "POST",
+                            url: '/admin/ajax/apartment/save',
+                            data: {
+                                apartment: this.apartment,
+                                building_id: building_id
+                            }
+                        }).done((res) => {
+                            document.location.href="/admin/list/" + building_id;
+                        }).fail(() => {
+                            alert("Произошла ошибка при сохранении данных");
+                        });
+                    }
+                }
+            }
+        },
+        addHouseFormSubmit() {
+            if (this.houseTitle === '') {
+                alert("Заполните поле название дома");
+            } else {
+                var building_id = $("#building-id").val();
+                $.ajax({
+                    type: "POST",
+                    url: '/admin/ajax/house/save',
+                    data: {
+                        title: this.houseTitle,
+                        building_id: building_id
+                    }
+                }).done((res) => {
+                    document.location.href="/admin/list/" + building_id;
+                }).fail(() => {
+                    alert("Произошла ошибка при сохранении данных");
                 });
             }
         }
