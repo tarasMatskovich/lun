@@ -5,14 +5,21 @@
 <div id="add-building">
     <h1 class="title">Создание новой новостройки</h1>
 
+    <?php if( Yii::$app->session->hasFlash('error') ): ?>
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <?php echo Yii::$app->session->getFlash('error'); ?>
+        </div>
+    <?php endif;?>
+
     <form action="" method="POST">
         <div class="form-group">
             <label for="name">Название новостройки: </label>
-            <input type="text" class="form-control" id="name" placeholder="Название">
+            <input type="text" class="form-control" id="name" placeholder="Название" v-model="buildingTitle">
         </div>
         <div class="form-group">
             <label for="city">Город новостройки: </label>
-            <input type="text" class="form-control" id="city" placeholder="Город">
+            <input type="text" class="form-control" id="city" placeholder="Город" v-model="buildingCity">
         </div>
         <div class="form-group">
             <label for="list">Список домов в новостройке:</label>
@@ -26,6 +33,35 @@
         </div>
         <div class="form-group">
             <label for="">Список квартир в новостройке:</label>
+            <table class="table" v-if="apartments.length > 0">
+                <thead>
+                    <tr>
+                        <th scope="col">Количество комнат</th>
+                        <th scope="col">Площадь</th>
+                        <th scope="col">Цена за 1м квадратный</th>
+                        <th scope="col">Цена за всю квартиру</th>
+                        <th scope="col">Типовая</th>
+                        <th scope="col">Дом</th>
+                        <th scope="col">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="apartment in apartments">
+                        <td>{{apartment.rooms}}</td>
+                        <td>{{apartment.square}}</td>
+                        <td>{{apartment.fullPrice ? "-" : apartment.price}}</td>
+                        <td>{{apartment.fullPrice ? apartment.price : "-"}}</td>
+                        <td>{{apartment.typical ? "Да" : "Нет"}}</td>
+                        <td>{{apartment.typical ? "Все" : getHouse(apartment)}}</td>
+                        <td>
+                            <a href="#" class="delete-house-icon" @click.prevent="onApartmentDelete(apartment.id)">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
 
             <div class="card">
                 <div class="card-header">
@@ -45,13 +81,13 @@
                     </div>
                     <div class="form-group" v-if="!typical">
                         <label for="non-t-house">Дом для нетиповой квартиры:</label>
-                        <select name="" id="non-t-house" class="form-control">
-                            <option value="" v-for="house in houses">{{house.title}}</option>
+                        <select name="" id="non-t-house" class="form-control" v-model="apartment.house_id">
+                            <option :value="house.id" v-for="house in houses">{{house.title}}</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="rooms-count">Количество комнат:</label>
-                        <select name="" id="rooms-count" class="form-control">
+                        <select name="" id="rooms-count" class="form-control" v-model="apartment.rooms">
                             <option value="студия">Студия</option>
                             <option value="1к">1к</option>
                             <option value="2к">2к</option>
@@ -63,17 +99,21 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label for="square">Общая площадь:</label>
+                        <input type="number" id="square" class="form-control" placeholder="Площадь" v-model="apartment.square">
+                    </div>
+                    <div class="form-group">
                         <label for="price">Цена:</label>
-                        <input type="number" class="form-control" v-model="apartment.price">
+                        <input type="number" class="form-control" v-model="apartment.price" placeholder="Цена">
                     </div>
                     <div class="form-group">
                         <label for="">Цена указана:</label>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="priceType" id="per" :value="true" v-model="apartment.fullPrice">
+                            <input class="form-check-input" type="radio" name="priceType" id="per" :value="false" v-model="apartment.fullPrice">
                             <label class="form-check-label" for="per">За 1 квадратный метр</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="priceType" id="full" :value="false" v-model="apartment.fullPrice">
+                            <input class="form-check-input" type="radio" name="priceType" id="full" :value="true" v-model="apartment.fullPrice">
                             <label class="form-check-label" for="full">За всю квартиру</label>
                         </div>
                     </div>
@@ -81,10 +121,10 @@
             </div>
         </div>
         <div class="form-group">
-            <button type="button" class="btn btn-primary">Добавить квартиру</button>
+            <button type="button" class="btn btn-primary" @click="onApartmentAdd">Добавить квартиру</button>
         </div>
         <div class="form-group">
-            <button type="button" class="btn btn-success">Создать новостройку</button>
+            <button type="button" class="btn btn-success" @click="onBuildingSave">Создать новостройку</button>
         </div>
     </form>
 </div>

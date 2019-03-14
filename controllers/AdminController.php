@@ -4,7 +4,10 @@ namespace app\controllers;
 
 use app\models\Building;
 use app\models\House;
+use app\models\NonTypicalApartment;
+use app\models\TypicalApartment;
 use yii\web\NotFoundHttpException;
+use Yii;
 
 class AdminController extends \yii\web\Controller
 {
@@ -24,10 +27,6 @@ class AdminController extends \yii\web\Controller
         $building = Building::findOne($id);
         if (!$building)
             throw new NotFoundHttpException("Такой новостройки нет");
-//        echo '<pre>';
-//        print_r($building);
-//        echo '</pre>';
-//        die;
         return $this->render('show', ['building' => $building]);
     }
 
@@ -48,6 +47,71 @@ class AdminController extends \yii\web\Controller
 
     public function actionSave()
     {
+        $building = new Building();
+        $data = Yii::$app->request->post();
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        if (!isset($data['building']['title']) || !isset($data['building']['city'])) {
+            Yii::$app->session->setFlash('error', 'Поля название и город обезательны');
+            return ['error' => true];
+        } else {
+            $building->title = $data['building']['title'];
+            $building->city = $data['building']['city'];
+            if ($building->save()) {
+                $this->saveBuildingHouses($data, $building->id);
+            }
+            Yii::$app->session->setFlash('success', 'Новостройка была успешно создана');
+            return ['error' => false];
+        }
+    }
+
+    protected function saveBuildingHouses($data, $building_id)
+    {
+        $localHouses = [];
+        if (isset($data['houses'])) {
+            $houses = $data['houses'];
+            foreach ($houses as $house) {
+                $houseModel = new House();
+                $houseModel->title = $house['title'];
+                $houseModel->building_id = $building_id;
+                $houseModel->save(false);
+                $localHouses[$house['id']] = $houseModel->id;
+            }
+        }
+        if (isset($data['apartments'])) {
+            $apartments = $data['apartments'];
+            foreach ($apartments as $apartment) {
+                if ($apartment['typical'] === 'true') {
+                    $apartmentModel = new TypicalApartment();
+                    $apartmentModel->rooms = $apartment['rooms'];
+                    $apartmentModel->square = $apartment['square'];
+                    if ($apartment['fullPrice']) {
+                        $apartmentModel->price = $apartment['price'];
+                        $apartmentModel->price_per_square_meter = null;
+                    } else {
+                        $apartmentModel->price = null;
+                        $apartmentModel->price_per_square_meter = $apartment['price'];
+                    }
+                    $apartmentModel->building_id = $building_id;
+                    $apartmentModel->save();
+                } else {
+                    if (isset($localHouses[$apartment['house_id']])) {
+                        $apartmentModel = new NonTypicalApartment();
+                        $apartmentModel->rooms = $apartment['rooms'];
+                        $apartmentModel->square = $apartment['square'];
+                        if ($apartment['fullPrice']) {
+                            $apartmentModel->price = $apartment['price'];
+                            $apartmentModel->price_per_square_meter = null;
+                        } else {
+                            $apartmentModel->price = null;
+                            $apartmentModel->price_per_square_meter = $apartment['price'];
+                        }
+                        $apartmentModel->house_id = $localHouses[$apartment['house_id']];
+                        $apartmentModel->save();
+                    }
+                }
+
+            }
+        }
 
     }
 

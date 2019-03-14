@@ -50,6 +50,7 @@ $config = [
                 '' => 'index/index',
                 'admin' => 'admin/index',
                 'admin/add' => 'admin/add',
+                'admin/ajax/building/save' => 'admin/save',
                 'admin/list' => 'admin/list',
                 'admin/list/<id:\d+>' => 'admin/show',
                 'admin/edit/<id:\d+>' => 'admin/edit',
