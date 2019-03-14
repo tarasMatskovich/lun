@@ -71,6 +71,7 @@ $config = [
                 'admin/apartment/typical/delete/<id:\d+>' => 'admin/typicaldelete',
                 'admin/apartment/nontypical/delete/<id:\d+>' => 'admin/nontypicaldelete',
                 'search' => 'search/index',
+                'search/query' => 'search/search'
             ],
         ],
     ],
