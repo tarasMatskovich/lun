@@ -99,11 +99,11 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="square">Общая площадь:</label>
+                        <label for="square">Общая площадь (квадратные метры):</label>
                         <input type="number" id="square" class="form-control" placeholder="Площадь" v-model="apartment.square">
                     </div>
                     <div class="form-group">
-                        <label for="price">Цена:</label>
+                        <label for="price">Цена (грн):</label>
                         <input type="number" class="form-control" v-model="apartment.price" placeholder="Цена">
                     </div>
                     <div class="form-group">
